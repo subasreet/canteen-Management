@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>College Canteen Management System</title>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f5f6f8;
+    color: #222;
+}
+
+/* HEADER */
+
+header {
+    background: #20242b;
+    color: white;
+    padding: 18px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 25px;
+}
+
+nav a:hover {
+    color: #ff7200;
+}
+
+/* HERO */
+
+.hero {
+    height: 300px;
+
+    background:
+    linear-gradient(
+        rgba(0,0,0,0.55),
+        rgba(0,0,0,0.55)
+    ),
+    url("https://images.unsplash.com/photo-1515003197210-e0cd71810b5f")
+    center/cover;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    color: white;
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    font-size: 18px;
+}
+
+/* MAIN */
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.heading {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.heading h2 {
+    font-size: 30px;
+}
+
+.heading p {
+    color: #777;
+    margin-top: 8px;
+}
+
+/* SEARCH */
+
+.search-box {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.search-box input {
+    width: 320px;
+    padding: 12px 18px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    outline: none;
+}
+
+/* CATEGORY */
+
+.categories {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 35px;
+}
+
+.category-btn {
+    padding: 11px 25px;
+    border: 1px solid #ff7200;
+    background: white;
+    color: #ff7200;
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+.category-btn:hover,
+.category-btn.active {
+    background: #ff7200;
+    color: white;
+}
+
+/* FOOD GRID */
+
+.food-grid {
+    display: grid;
+    grid-template-columns:
+    repeat(auto-fit, minmax(240px, 1fr));
+
+    gap: 25px;
+}
+
+.food-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+
+    box-shadow:
+    0 4px 15px rgba(0,0,0,0.10);
+
+    transition: 0.3s;
+}
+
+.food-card:hover {
+    transform: translateY(-5px);
+}
+
+.food-card img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    display: block;
+}
+
+.food-info {
+    padding: 18px;
+}
+
+.category-name {
+    color: #ff7200;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.food-info h3 {
+    margin: 8px 0;
+    font-size: 21px;
+}
+
+.food-info p {
+    color: #777;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.food-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    color: #ff7200;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.add-btn {
+    background: #ff7200;
+    color: white;
+    border: none;
+    padding: 9px 17px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.add-btn:hover {
+    background: #e65f00;
+}
+
+/* CART */
+
+.cart {
+    margin-top: 50px;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+
+    box-shadow:
+    0 4px 15px rgba(0,0,0,0.10);
+}
+
+.cart h2 {
+    margin-bottom: 20px;
+}
+
+#cartItems {
+    list-style: none;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 0;
+
+    border-bottom: 1px solid #ddd;
+}
+
+.quantity button {
+    width: 30px;
+    height: 30px;
+
+    border: none;
+    background: #eeeeee;
+
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.quantity span {
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 20px;
+
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.order-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+
+    background: #28a745;
+    color: white;
+
+    border: none;
+    border-radius: 7px;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.order-btn:hover {
+    background: #218838;
+}
+
+/* FOOTER */
+
+footer {
+    background: #20242b;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-top: 50px;
+}
+
+/* MOBILE */
+
+@media(max-width:600px) {
+
+    header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    nav a {
+        margin: 8px;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+
+    .search-box input {
+        width: 90%;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<!-- HEADER -->
+
+<header>
+
+    <div class="logo">
+        🍴 College Canteen
+    </div>
+
+    <nav>
+        <a href="#">Home</a>
+        <a href="#menu">Menu</a>
+        <a href="#cart">Cart</a>
+        <a href="#">Orders</a>
+    </nav>
+
+</header>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <div>
+
+        <h1>College Canteen</h1>
+
+        <p>
+            Fresh Food • Easy Ordering • Quick Service
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- MENU -->
+
+<div class="container" id="menu">
+
+    <div class="heading">
+
+        <h2>Our Menu</h2>
+
+        <p>
+            Choose your favourite food
+        </p>
+
+    </div>
+
+
+    <!-- SEARCH -->
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="search"
+            placeholder="🔍 Search food..."
+            onkeyup="searchFood()"
+        >
+
+    </div>
+
+
+    <!-- CATEGORIES -->
+
+    <div class="categories">
+
+        <button
+            class="category-btn active"
+            onclick="filterFood('all', this)"
+        >
+            All
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="filterFood('breakfast', this)"
+        >
+            🍳 Breakfast
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="filterFood('lunch', this)"
+        >
+            🍛 Lunch
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="filterFood('snacks', this)"
+        >
+            🍟 Snacks
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="filterFood('drinks', this)"
+        >
+            🥤 Drinks
+        </button>
+
+    </div>
+
+
+    <!-- FOOD GRID -->
+
+    <div class="food-grid">
+
+
+        <!-- ================= IDLI ================= -->
+
+        <div class="food-card" data-category="breakfast">
+
+            <img
+                src="https://images.unsplash.com/photo-1630383249896-424e482df921"
+                alt="South Indian Idli"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Breakfast
+                </span>
+
+                <h3>Idli</h3>
+
+                <p>
+                    Soft South Indian idli served
+                    with chutney and sambar.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹30
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Idli',30)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= DOSA ================= -->
+
+        <div class="food-card" data-category="breakfast">
+
+            <img
+                src="https://images.unsplash.com/photo-1668236543090-82eba5ee5976"
+                alt="Dosa"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Breakfast
+                </span>
+
+                <h3>Dosa</h3>
+
+                <p>
+                    Crispy dosa served with chutney
+                    and sambar.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹50
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Dosa',50)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= POORI ================= -->
+
+        <div class="food-card" data-category="breakfast">
+
+            <img
+                src="https://images.unsplash.com/photo-1626132647523-66f5bf380027"
+                alt="Poori"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Breakfast
+                </span>
+
+                <h3>Poori</h3>
+
+                <p>
+                    Hot and fluffy poori served with
+                    potato masala.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹45
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Poori',45)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= CHICKEN BIRYANI ================= -->
+
+        <div class="food-card" data-category="lunch">
+
+            <img
+                src="https://images.unsplash.com/photo-1563379091339-03246963d96c"
+                alt="Chicken Biryani"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Lunch
+                </span>
+
+                <h3>Chicken Biryani</h3>
+
+                <p>
+                    Delicious aromatic chicken
+                    biryani with special spices.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹120
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Chicken Biryani',120)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= MEALS ================= -->
+
+        <div class="food-card" data-category="lunch">
+
+            <img
+                src="https://images.unsplash.com/photo-1546833999-b9f581a1996d"
+                alt="South Indian Meals"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Lunch
+                </span>
+
+                <h3>South Indian Meals</h3>
+
+                <p>
+                    Rice, curry, vegetables and
+                    traditional side dishes.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹80
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('South Indian Meals',80)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= FRIED RICE ================= -->
+
+        <div class="food-card" data-category="lunch">
+
+            <img
+                src="https://images.unsplash.com/photo-1603133872878-684f208fb84b"
+                alt="Fried Rice"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Lunch
+                </span>
+
+                <h3>Fried Rice</h3>
+
+                <p>
+                    Tasty vegetable fried rice
+                    with fresh vegetables.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹70
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Fried Rice',70)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= SAMOSA ================= -->
+
+        <div class="food-card" data-category="snacks">
+
+            <img
+                src="https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7"
+                alt="Samosa"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Snacks
+                </span>
+
+                <h3>Samosa</h3>
+
+                <p>
+                    Crispy samosa filled with
+                    spicy potato.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹20
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Samosa',20)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= VADA ================= -->
+
+        <div class="food-card" data-category="snacks">
+
+            <img
+                src="https://images.unsplash.com/photo-1601050690597-df0568f70950"
+                alt="Medu Vada"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Snacks
+                </span>
+
+                <h3>Medu Vada</h3>
+
+                <p>
+                    Crispy South Indian vada served
+                    with chutney.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹15
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Medu Vada',15)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= SANDWICH ================= -->
+
+        <div class="food-card" data-category="snacks">
+
+            <img
+                src="https://images.unsplash.com/photo-1528735602780-2552fd46c7af"
+                alt="Sandwich"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Snacks
+                </span>
+
+                <h3>Vegetable Sandwich</h3>
+
+                <p>
+                    Fresh vegetable sandwich with
+                    tasty filling.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹40
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Vegetable Sandwich',40)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= TEA ================= -->
+
+        <div class="food-card" data-category="drinks">
+
+            <img
+                src="https://images.unsplash.com/photo-1544787219-7f47ccb76574"
+                alt="Tea"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Drinks
+                </span>
+
+                <h3>Tea</h3>
+
+                <p>
+                    Hot and refreshing tea.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹15
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Tea',15)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= COFFEE ================= -->
+
+        <div class="food-card" data-category="drinks">
+
+            <img
+                src="https://images.unsplash.com/photo-1509042239860-f550ce710b93"
+                alt="Coffee"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Drinks
+                </span>
+
+                <h3>Coffee</h3>
+
+                <p>
+                    Hot and fresh filter coffee.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹20
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Coffee',20)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= LEMON JUICE ================= -->
+
+        <div class="food-card" data-category="drinks">
+
+            <img
+                src="https://images.unsplash.com/photo-1621263764928-df1444c5e859"
+                alt="Lemon Juice"
+            >
+
+            <div class="food-info">
+
+                <span class="category-name">
+                    Drinks
+                </span>
+
+                <h3>Lemon Juice</h3>
+
+                <p>
+                    Fresh and refreshing lemon juice.
+                </p>
+
+                <div class="food-bottom">
+
+                    <span class="price">
+                        ₹25
+                    </span>
+
+                    <button
+                        class="add-btn"
+                        onclick="addToCart('Lemon Juice',25)"
+                    >
+                        Add
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- CART -->
+
+    <div class="cart" id="cart">
+
+        <h2>🛒 My Cart</h2>
+
+        <ul id="cartItems"></ul>
+
+        <div class="total">
+
+            <span>Total Amount</span>
+
+            <span id="total">
+                ₹0
+            </span>
+
+        </div>
+
+        <button
+            class="order-btn"
+            onclick="placeOrder()"
+        >
+            Place Order
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- FOOTER -->
+
+<footer>
+
+    <p>
+        © 2026 College Canteen Management System
+    </p>
+
+</footer>
+
+
+<script>
+
+/* CART */
+
+let cart = {};
+
+
+/* FILTER */
+
+function filterFood(category, button) {
+
+    let cards =
+        document.querySelectorAll(".food-card");
+
+    let buttons =
+        document.querySelectorAll(".category-btn");
+
+
+    buttons.forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    button.classList.add("active");
+
+
+    cards.forEach(card => {
+
+        if (
+            category === "all" ||
+            card.dataset.category === category
+        ) {
+
+            card.style.display = "block";
+
+        } else {
+
+            card.style.display = "none";
+
+        }
+
+    });
+
+}
+
+
+/* SEARCH */
+
+function searchFood() {
+
+    let search =
+        document
+        .getElementById("search")
+        .value
+        .toLowerCase();
+
+
+    let cards =
+        document.querySelectorAll(".food-card");
+
+
+    cards.forEach(card => {
+
+        let name =
+            card
+            .querySelector("h3")
+            .innerText
+            .toLowerCase();
+
+
+        if (name.includes(search)) {
+
+            card.style.display = "block";
+
+        } else {
+
+            card.style.display = "none";
+
+        }
+
+    });
+
+}
+
+
+/* ADD FOOD */
+
+function addToCart(name, price) {
+
+    if (cart[name]) {
+
+        cart[name].quantity++;
+
+    } else {
+
+        cart[name] = {
+
+            price: price,
+            quantity: 1
+
+        };
+
+    }
+
+    displayCart();
+
+}
+
+
+/* DISPLAY CART */
+
+function displayCart() {
+
+    let cartItems =
+        document.getElementById("cartItems");
+
+    cartItems.innerHTML = "";
+
+    let total = 0;
+
+
+    for (let item in cart) {
+
+        let product = cart[item];
+
+        let itemTotal =
+            product.price *
+            product.quantity;
+
+        total += itemTotal;
+
+
+        let li =
+            document.createElement("li");
+
+        li.className = "cart-item";
+
+
+        li.innerHTML = `
+
+            <span>
+
+                <strong>${item}</strong>
+
+                <br>
+
+                ₹${product.price}
+
+            </span>
+
+
+            <div class="quantity">
+
+                <button
+                    onclick="changeQuantity('${item}',-1)"
+                >
+                    −
+                </button>
+
+                <span>
+                    ${product.quantity}
+                </span>
+
+                <button
+                    onclick="changeQuantity('${item}',1)"
+                >
+                    +
+                </button>
+
+            </div>
+
+
+            <strong>
+                ₹${itemTotal}
+            </strong>
+
+        `;
+
+
+        cartItems.appendChild(li);
+
+    }
+
+
+    document.getElementById("total")
+        .innerText = "₹" + total;
+
+}
+
+
+/* QUANTITY */
+
+function changeQuantity(name, change) {
+
+    cart[name].quantity += change;
+
+
+    if (cart[name].quantity <= 0) {
+
+        delete cart[name];
+
+    }
+
+
+    displayCart();
+
+}
+
+
+/* ORDER */
+
+function placeOrder() {
+
+    let total =
+        document.getElementById("total")
+        .innerText;
+
+
+    if (total === "₹0") {
+
+        alert(
+            "Please add food to your cart."
+        );
+
+        return;
+
+    }
+
+
+    alert(
+        "Order placed successfully!\n\n" +
+        "Total Amount: " + total
+    );
+
+
+    cart = {};
+
+    displayCart();
+
+}
+
+</script>
+
+</body>
+</html>
