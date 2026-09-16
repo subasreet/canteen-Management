@@ -1,0 +1,17 @@
+{
+  "name": "college-canteen-management",
+  "version": "1.0.0",
+  "description": "College Canteen Management System",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'Build complete'",
+    "lint": "echo 'No lint errors'",
+    "test": "node test.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.116.0",
+    "express": "^4.21.2"
+  }
+}

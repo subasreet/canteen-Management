@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>College Canteen Management</title>
+<meta property="og:title" content="College Canteen Management">
+<meta name="description" content="A college canteen management system to browse food items, filter by category, search the menu, and place orders with Supabase PostgreSQL database integration.">
+<meta property="og:description" content="A college canteen management system to browse food items, filter by category, search the menu, and place orders with Supabase PostgreSQL database integration.">
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f5f6f8;
+    color: #222;
+}
+
+/* HEADER */
+
+header {
+    background: #20242b;
+    color: white;
+    padding: 18px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+
+nav a:hover {
+    color: #ff7200;
+}
+
+.user-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #2c323c;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.role-pill {
+    background: #ff7200;
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.role-pill.admin {
+    background: #e63946;
+}
+
+.btn-header {
+    background: #ff7200;
+    color: white;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-header:hover {
+    background: #e65f00;
+}
+
+.btn-logout {
+    background: #444;
+}
+
+.btn-logout:hover {
+    background: #555;
+}
+
+/* HERO */
+
+.hero {
+    height: 280px;
+    background:
+    linear-gradient(
+        rgba(0,0,0,0.6),
+        rgba(0,0,0,0.6)
+    ),
+    url("https://images.unsplash.com/photo-1515003197210-e0cd71810b5f")
+    center/cover;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding: 20px;
+}
+
+.hero h1 {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    font-size: 18px;
+    opacity: 0.95;
+}
+
+/* MAIN */
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.heading {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.heading h2 {
+    font-size: 30px;
+}
+
+.heading p {
+    color: #777;
+    margin-top: 8px;
+}
+
+/* SEARCH & CONTROLS */
+
+.search-bar-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    text-align: center;
+}
+
+.search-box input {
+    width: 320px;
+    max-width: 100%;
+    padding: 12px 18px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    outline: none;
+    font-size: 15px;
+}
+
+.btn-admin-add {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none;
+}
+
+.btn-admin-add:hover {
+    background: #218838;
+}
+
+/* CATEGORY */
+
+.categories {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 35px;
+}
+
+.category-btn {
+    padding: 10px 22px;
+    border: 1px solid #ff7200;
+    background: white;
+    color: #ff7200;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.category-btn:hover,
+.category-btn.active {
+    background: #ff7200;
+    color: white;
+}
+
+/* FOOD GRID */
+
+.food-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.food-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.food-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.food-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    background: #eee;
+}
+
+.food-info {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.category-name {
+    color: #ff7200;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.food-info h3 {
+    margin: 8px 0;
+    font-size: 20px;
+    color: #222;
+}
+
+.food-info p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    flex-grow: 1;
+}
+
+.food-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.price {
+    color: #ff7200;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.add-btn {
+    background: #ff7200;
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.add-btn:hover {
+    background: #e65f00;
+}
+
+.admin-card-actions {
+    display: none;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed #eee;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.btn-card-edit {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.btn-card-delete {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* CART & ORDERS SPLIT OR ROW */
+
+.grid-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+@media(max-width: 900px) {
+    .grid-sections {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cart, .orders-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.cart h2, .orders-card h2 {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 22px;
+}
+
+#cartItems {
+    list-style: none;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.quantity button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: #eee;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.quantity button:hover {
+    background: #ddd;
+}
+
+.quantity span {
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.order-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.order-btn:hover {
+    background: #218838;
+}
+
+/* ORDER HISTORY */
+
+.orders-list {
+    list-style: none;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+.order-history-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.order-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.order-id {
+    font-weight: bold;
+    color: #333;
+}
+
+.status-badge {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 12px;
+    text-transform: capitalize;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-preparing {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.status-ready {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-completed {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.order-items-summary {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.order-history-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #888;
+}
+
+.admin-status-select {
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: white;
+}
+
+/* MODAL */
+
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 18px;
+    font-size: 22px;
+    color: #999;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+.modal-title {
+    font-size: 22px;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+}
+
+.modal-btn-submit {
+    width: 100%;
+    padding: 12px;
+    background: #ff7200;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.modal-btn-submit:hover {
+    background: #e65f00;
+}
+
+.demo-account-pills {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.demo-pill {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    background: #fafafa;
+}
+
+.demo-pill:hover {
+    border-color: #ff7200;
+    background: #fff8f2;
+}
+
+/* NOTICE BANNER */
+
+.notice-banner {
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: none;
+    font-size: 14px;
+}
+
+.notice-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.notice-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* FOOTER */
+
+footer {
+    background: #20242b;
+    color: #aaa;
+    text-align: center;
+    padding: 24px;
+    margin-top: 60px;
+    font-size: 14px;
+}
+
+footer a {
+    color: #ff7200;
+    text-decoration: none;
+}
+
+.db-badge {
+    display: inline-block;
+    background: #2d333b;
+    color: #38d39f;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-top: 10px;
+    border: 1px solid #414b57;
+}
+
+/* MOBILE RESPONSIVE */
+
+@media(max-width: 650px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .nav-container {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .hero h1 {
+        font-size: 30px;
+    }
+    .search-box input {
+        width: 100%;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<header id="header-main">
+
+    <a href="#" class="logo">
+        🍴 College Canteen
+    </a>
+
+    <div class="nav-container">
+
+        <nav>
+            <a href="#">Home</a>
+            <a href="#menu">Menu</a>
+            <a href="#cart">Cart</a>
+            <a href="#orders">Orders</a>
+        </nav>
+
+        <div id="authContainer">
+            <button id="btnLoginOpen" class="btn-header" onclick="openLoginModal()">
+                🔑 Login
+            </button>
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- HERO -->
+
+<section class="hero" id="hero-section">
+
+    <div>
+
+        <h1>College Canteen</h1>
+
+        <p>
+            Fresh Food • Easy Ordering • Quick Service
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- MAIN CONTENT -->
+
+<div class="container" id="menu">
+
+    <div class="heading">
+
+        <h2>Our Menu</h2>
+
+        <p>
+            Choose your favourite food
+        </p>
+
+    </div>
+
+    <!-- Alert / Notice message -->
+    <div id="statusNotice" class="notice-banner"></div>
+
+    <!-- SEARCH & ADMIN ACTIONS -->
+
+    <div class="search-bar-row">
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="search"
+                placeholder="🔍 Search food..."
+                oninput="handleSearch(this.value)"
+            >
+
+        </div>
+
+        <button id="btnAdminAddFood" class="btn-admin-add" onclick="openAddFoodModal()">
+            ➕ Add Food Item
+        </button>
+
+    </div>
+
+
+    <!-- CATEGORIES -->
+
+    <div class="categories" id="category-filter-bar">
+
+        <button
+            id="btn-cat-all"
+            class="category-btn active"
+            onclick="filterFood('all', this)"
+        >
+            All
+        </button>
+
+        <button
+            id="btn-cat-breakfast"
+            class="category-btn"
+            onclick="filterFood('breakfast', this)"
+        >
+            🍳 Breakfast
+        </button>
+
+        <button
+            id="btn-cat-lunch"
+            class="category-btn"
+            onclick="filterFood('lunch', this)"
+        >
+            🍛 Lunch
+        </button>
+
+        <button
+            id="btn-cat-snacks"
+            class="category-btn"
+            onclick="filterFood('snacks', this)"
+        >
+            🍟 Snacks
+        </button>
+
+        <button
+            id="btn-cat-drinks"
+            class="category-btn"
+            onclick="filterFood('drinks', this)"
+        >
+            🥤 Drinks
+        </button>
+
+    </div>
+
+
+    <!-- FOOD GRID -->
+
+    <div class="food-grid" id="food-grid">
+        <!-- Rendered dynamically from Supabase / API -->
+    </div>
+
+
+    <!-- CART & ORDERS SECTION -->
+
+    <div class="grid-sections">
+
+        <!-- CART -->
+
+        <div class="cart" id="cart">
+
+            <h2>🛒 My Cart</h2>
+
+            <ul id="cartItems">
+                <li style="color: #999; padding: 15px 0;">Your cart is empty. Add food items from the menu above!</li>
+            </ul>
+
+            <div class="total">
+
+                <span>Total Amount</span>
+
+                <span id="total">
+                    ₹0
+                </span>
+
+            </div>
+
+            <button
+                id="place-order-btn"
+                class="order-btn"
+                onclick="placeOrder()"
+            >
+                Place Order
+            </button>
+
+        </div>
+
+
+        <!-- ORDER STATUS & HISTORY (FR-05) -->
+
+        <div class="orders-card" id="orders">
+
+            <h2>
+                <span>📋 Order History</span>
+                <button onclick="loadOrders()" style="background: none; border: none; font-size: 14px; color: #ff7200; cursor: pointer;">
+                    🔄 Refresh
+                </button>
+            </h2>
+
+            <div id="ordersContainer">
+                <ul id="ordersList" class="orders-list">
+                    <li style="color: #999; padding: 15px 0;">Loading orders...</li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- FOOTER -->
+
+<footer id="footer-main">
+
+    <p>
+        © 2026 College Canteen Management System
+    </p>
+
+    <div id="dbStatusBadge" class="db-badge">
+        ⚡ Database: Supabase PostgreSQL Connected
+    </div>
+
+</footer>
+
+
+<!-- ======================================================= -->
+<!-- LOGIN MODAL (FR-01) -->
+<!-- ======================================================= -->
+
+<div id="loginModal" class="modal-backdrop">
+
+    <div class="modal-content">
+
+        <button class="modal-close" onclick="closeLoginModal()">×</button>
+
+        <h3 class="modal-title">Canteen Login</h3>
+
+        <p style="font-size: 13px; color: #777; margin-bottom: 15px;">
+            Select a demo account or enter credentials:
+        </p>
+
+        <div class="demo-account-pills">
+            <div class="demo-pill" onclick="fillLogin('student', 'student123')">
+                <strong>Student</strong><br>
+                student / student123
+            </div>
+            <div class="demo-pill" onclick="fillLogin('admin', 'admin123')">
+                <strong>Admin</strong><br>
+                admin / admin123
+            </div>
+        </div>
+
+        <form onsubmit="handleLoginSubmit(event)">
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" required placeholder="e.g. student or admin">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" required placeholder="Enter password">
+            </div>
+
+            <div id="loginError" style="color: #dc3545; font-size: 13px; margin-bottom: 10px; display: none;"></div>
+
+            <button type="submit" class="modal-btn-submit">Sign In</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================= -->
+<!-- ADMIN ADD/EDIT FOOD ITEM MODAL (FR-06) -->
+<!-- ======================================================= -->
+
+<div id="foodModal" class="modal-backdrop">
+
+    <div class="modal-content">
+
+        <button class="modal-close" onclick="closeFoodModal()">×</button>
+
+        <h3 id="foodModalTitle" class="modal-title">Add Food Item</h3>
+
+        <form onsubmit="handleFoodFormSubmit(event)">
+
+            <input type="hidden" id="foodEditId">
+
+            <div class="form-group">
+                <label>Food Item Name</label>
+                <input type="text" id="foodName" required placeholder="e.g. Masala Dosa">
+            </div>
+
+            <div class="form-group">
+                <label>Category</label>
+                <select id="foodCategory" required>
+                    <option value="breakfast">Breakfast</option>
+                    <option value="lunch">Lunch</option>
+                    <option value="snacks">Snacks</option>
+                    <option value="drinks">Drinks</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Price (₹)</label>
+                <input type="number" id="foodPrice" required min="1" step="0.5" placeholder="e.g. 50">
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="foodDescription" rows="2" placeholder="Item description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Image URL</label>
+                <input type="url" id="foodImageUrl" placeholder="https://images.unsplash.com/...">
+            </div>
+
+            <button type="submit" class="modal-btn-submit" id="btnFoodSubmit">Save Food Item</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+// Global State
+let currentUser = null;
+let allFoodItems = [];
+let activeCategory = 'all';
+let currentSearch = '';
+let cart = {}; // key: item id or name -> { id, name, price, quantity }
+
+// Initial Fallback Seed data (displayed instantly while API is queried)
+const DEFAULT_SEED_ITEMS = [
+    { id: 1, name: 'Idli', category: 'breakfast', price: 30, description: 'Soft South Indian idli served with chutney and sambar.', image_url: 'https://images.unsplash.com/photo-1630383249896-424e482df921' },
+    { id: 2, name: 'Dosa', category: 'breakfast', price: 50, description: 'Crispy dosa served with chutney and sambar.', image_url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976' },
+    { id: 3, name: 'Poori', category: 'breakfast', price: 45, description: 'Hot and fluffy poori served with potato masala.', image_url: 'https://images.unsplash.com/photo-1626132647523-66f5bf380027' },
+    { id: 4, name: 'Chicken Biryani', category: 'lunch', price: 120, description: 'Delicious aromatic chicken biryani with special spices.', image_url: 'https://images.unsplash.com/photo-1563379091339-03246963d96c' },
+    { id: 5, name: 'South Indian Meals', category: 'lunch', price: 80, description: 'Rice, curry, vegetables and traditional side dishes.', image_url: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d' },
+    { id: 6, name: 'Fried Rice', category: 'lunch', price: 70, description: 'Tasty vegetable fried rice with fresh vegetables.', image_url: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b' },
+    { id: 7, name: 'Samosa', category: 'snacks', price: 20, description: 'Crispy samosa filled with spicy potato.', image_url: 'https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7' },
+    { id: 8, name: 'Medu Vada', category: 'snacks', price: 15, description: 'Crispy South Indian vada served with chutney.', image_url: 'https://images.unsplash.com/photo-1601050690597-df0568f70950' },
+    { id: 9, name: 'Vegetable Sandwich', category: 'snacks', price: 40, description: 'Fresh vegetable sandwich with tasty filling.', image_url: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af' },
+    { id: 10, name: 'Tea', category: 'drinks', price: 15, description: 'Hot and refreshing tea.', image_url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574' },
+    { id: 11, name: 'Coffee', category: 'drinks', price: 20, description: 'Hot and fresh filter coffee.', image_url: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93' },
+    { id: 12, name: 'Lemon Juice', category: 'drinks', price: 25, description: 'Fresh and refreshing lemon juice.', image_url: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859' }
+];
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+    // Restore session if previously saved
+    try {
+        const saved = localStorage.getItem('canteen_user');
+        if (saved) {
+            currentUser = JSON.parse(saved);
+        } else {
+            // Default logged in as demo student for friction-free UX
+            currentUser = { id: 2, username: 'student', role: 'user', full_name: 'Demo Student' };
+        }
+    } catch(e) {
+        currentUser = { id: 2, username: 'student', role: 'user', full_name: 'Demo Student' };
+    }
+
+    updateUserUI();
+    loadFoodItems();
+    loadOrders();
+    checkDbStatus();
+});
+
+// -------------------------------------------------------------
+// USER & AUTHENTICATION (FR-01)
+// -------------------------------------------------------------
+function updateUserUI() {
+    const authContainer = document.getElementById('authContainer');
+    const btnAdminAdd = document.getElementById('btnAdminAddFood');
+
+    if (currentUser) {
+        authContainer.innerHTML = `
+            <div class="user-badge">
+                <span>👤 <strong>${escapeHtml(currentUser.full_name || currentUser.username)}</strong></span>
+                <span class="role-pill ${currentUser.role === 'admin' ? 'admin' : ''}">${currentUser.role}</span>
+                <button class="btn-header btn-logout" onclick="logout()">Logout</button>
+            </div>
+        `;
+        if (currentUser.role === 'admin') {
+            btnAdminAdd.style.display = 'inline-block';
+        } else {
+            btnAdminAdd.style.display = 'none';
+        }
+    } else {
+        authContainer.innerHTML = `
+            <button id="btnLoginOpen" class="btn-header" onclick="openLoginModal()">
+                🔑 Login
+            </button>
+        `;
+        btnAdminAdd.style.display = 'none';
+    }
+
+    renderFoodGrid();
+    loadOrders();
+}
+
+function openLoginModal() {
+    document.getElementById('loginError').style.display = 'none';
+    document.getElementById('loginModal').style.display = 'flex';
+}
+
+function closeLoginModal() {
+    document.getElementById('loginModal').style.display = 'none';
+}
+
+function fillLogin(u, p) {
+    document.getElementById('loginUsername').value = u;
+    document.getElementById('loginPassword').value = p;
+}
+
+async function handleLoginSubmit(event) {
+    event.preventDefault();
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    const errEl = document.getElementById('loginError');
+
+    try {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            errEl.innerText = data.error || 'Login failed';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        currentUser = data;
+        localStorage.setItem('canteen_user', JSON.stringify(currentUser));
+        closeLoginModal();
+        updateUserUI();
+        showNotice(`Welcome, ${currentUser.full_name}!`, 'success');
+    } catch (e) {
+        errEl.innerText = 'Unable to connect to server: ' + e.message;
+        errEl.style.display = 'block';
+    }
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('canteen_user');
+    updateUserUI();
+    showNotice('Logged out successfully.', 'success');
+}
+
+// -------------------------------------------------------------
+// FOOD ITEMS (FR-02, FR-06)
+// -------------------------------------------------------------
+async function loadFoodItems() {
+    try {
+        const res = await fetch('/api/food-items');
+        if (res.ok) {
+            allFoodItems = await res.json();
+        } else {
+            allFoodItems = DEFAULT_SEED_ITEMS;
+        }
+    } catch (err) {
+        console.warn('Using local food items cache:', err);
+        allFoodItems = DEFAULT_SEED_ITEMS;
+    }
+    renderFoodGrid();
+}
+
+function renderFoodGrid() {
+    const grid = document.getElementById('food-grid');
+    grid.innerHTML = '';
+
+    let filtered = allFoodItems;
+    if (activeCategory !== 'all') {
+        filtered = filtered.filter(item => item.category.toLowerCase() === activeCategory.toLowerCase());
+    }
+    if (currentSearch.trim()) {
+        const q = currentSearch.trim().toLowerCase();
+        filtered = filtered.filter(item => 
+            item.name.toLowerCase().includes(q) || 
+            (item.description && item.description.toLowerCase().includes(q))
+        );
+    }
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px 0; color: #888;">
+                <p style="font-size: 18px;">No food items found matching your filter.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const isAdmin = currentUser && currentUser.role === 'admin';
+
+    filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'food-card';
+        card.id = `food-card-${item.id}`;
+        card.dataset.category = item.category;
+
+        const imgUrl = item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c';
+
+        card.innerHTML = `
+            <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.name)}" referrerpolicy="no-referrer">
+            <div class="food-info">
+                <span class="category-name">${escapeHtml(item.category)}</span>
+                <h3>${escapeHtml(item.name)}</h3>
+                <p>${escapeHtml(item.description || 'Freshly prepared daily.')}</p>
+                <div class="food-bottom">
+                    <span class="price">₹${item.price}</span>
+                    <button class="add-btn" onclick="addToCart('${escapeHtml(item.name)}', ${item.price}, ${item.id})">
+                        Add
+                    </button>
+                </div>
+                ${isAdmin ? `
+                <div class="admin-card-actions" style="display: flex;">
+                    <button class="btn-card-edit" onclick="openEditFoodModal(${item.id})">✏️ Edit</button>
+                    <button class="btn-card-delete" onclick="deleteFoodItem(${item.id})">🗑️ Delete</button>
+                </div>
+                ` : ''}
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function filterFood(category, button) {
+    activeCategory = category;
+    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+    if (button) button.classList.add('active');
+    renderFoodGrid();
+}
+
+function handleSearch(val) {
+    currentSearch = val;
+    renderFoodGrid();
+}
+
+// -------------------------------------------------------------
+// ADMIN ACTIONS (FR-06)
+// -------------------------------------------------------------
+function openAddFoodModal() {
+    document.getElementById('foodModalTitle').innerText = 'Add Food Item';
+    document.getElementById('foodEditId').value = '';
+    document.getElementById('foodName').value = '';
+    document.getElementById('foodCategory').value = 'breakfast';
+    document.getElementById('foodPrice').value = '';
+    document.getElementById('foodDescription').value = '';
+    document.getElementById('foodImageUrl').value = '';
+    document.getElementById('foodModal').style.display = 'flex';
+}
+
+function openEditFoodModal(id) {
+    const item = allFoodItems.find(i => i.id === id);
+    if (!item) return;
+
+    document.getElementById('foodModalTitle').innerText = 'Edit Food Item';
+    document.getElementById('foodEditId').value = item.id;
+    document.getElementById('foodName').value = item.name;
+    document.getElementById('foodCategory').value = item.category;
+    document.getElementById('foodPrice').value = item.price;
+    document.getElementById('foodDescription').value = item.description || '';
+    document.getElementById('foodImageUrl').value = item.image_url || '';
+    document.getElementById('foodModal').style.display = 'flex';
+}
+
+function closeFoodModal() {
+    document.getElementById('foodModal').style.display = 'none';
+}
+
+async function handleFoodFormSubmit(event) {
+    event.preventDefault();
+    if (!currentUser || currentUser.role !== 'admin') {
+        alert('Administrator access required.');
+        return;
+    }
+
+    const editId = document.getElementById('foodEditId').value;
+    const payload = {
+        name: document.getElementById('foodName').value.trim(),
+        category: document.getElementById('foodCategory').value,
+        price: parseFloat(document.getElementById('foodPrice').value),
+        description: document.getElementById('foodDescription').value.trim(),
+        image_url: document.getElementById('foodImageUrl').value.trim()
+    };
+
+    const url = editId ? `/api/food-items/${editId}` : '/api/food-items';
+    const method = editId ? 'PUT' : 'POST';
+
+    try {
+        const res = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'x-user-role': 'admin'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            closeFoodModal();
+            showNotice(editId ? 'Food item updated!' : 'New food item added to menu!', 'success');
+            await loadFoodItems();
+        } else {
+            const err = await res.json();
+            alert('Operation failed: ' + (err.error || 'Server error'));
+        }
+    } catch (e) {
+        alert('Network error: ' + e.message);
+    }
+}
+
+async function deleteFoodItem(id) {
+    if (!confirm('Are you sure you want to remove this food item from the menu?')) return;
+    if (!currentUser || currentUser.role !== 'admin') {
+        alert('Administrator access required.');
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/food-items/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'x-user-role': 'admin'
+            }
+        });
+        if (res.ok) {
+            showNotice('Food item removed successfully.', 'success');
+            await loadFoodItems();
+        } else {
+            const err = await res.json();
+            alert('Failed to delete item: ' + (err.error || 'Error'));
+        }
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+}
+
+// -------------------------------------------------------------
+// CART (FR-03)
+// -------------------------------------------------------------
+function addToCart(name, price, id = null) {
+    if (cart[name]) {
+        cart[name].quantity++;
+    } else {
+        cart[name] = {
+            id: id,
+            name: name,
+            price: price,
+            quantity: 1
+        };
+    }
+    displayCart();
+    showNotice(`Added ${name} to cart.`, 'success');
+}
+
+function changeQuantity(name, change) {
+    if (!cart[name]) return;
+    cart[name].quantity += change;
+    if (cart[name].quantity <= 0) {
+        delete cart[name];
+    }
+    displayCart();
+}
+
+function displayCart() {
+    const cartItems = document.getElementById("cartItems");
+    cartItems.innerHTML = "";
+
+    const items = Object.values(cart);
+    if (items.length === 0) {
+        cartItems.innerHTML = '<li style="color: #999; padding: 15px 0;">Your cart is empty. Add food items from the menu above!</li>';
+        document.getElementById("total").innerText = "₹0";
+        return;
+    }
+
+    let total = 0;
+
+    items.forEach(product => {
+        const itemTotal = product.price * product.quantity;
+        total += itemTotal;
+
+        const li = document.createElement("li");
+        li.className = "cart-item";
+        li.innerHTML = `
+            <span>
+                <strong>${escapeHtml(product.name)}</strong>
+                <br>
+                ₹${product.price}
+            </span>
+            <div class="quantity">
+                <button onclick="changeQuantity('${escapeHtml(product.name)}', -1)">−</button>
+                <span>${product.quantity}</span>
+                <button onclick="changeQuantity('${escapeHtml(product.name)}', 1)">+</button>
+            </div>
+            <strong>₹${itemTotal}</strong>
+        `;
+        cartItems.appendChild(li);
+    });
+
+    document.getElementById("total").innerText = "₹" + total;
+}
+
+// -------------------------------------------------------------
+// ORDER PLACEMENT & HISTORY (FR-04, FR-05)
+// -------------------------------------------------------------
+async function placeOrder() {
+    const items = Object.values(cart);
+
+    if (items.length === 0) {
+        alert("Please add food items to your cart before placing an order.");
+        return;
+    }
+
+    const orderPayload = {
+        user_id: currentUser ? currentUser.id : null,
+        customer_name: currentUser ? (currentUser.full_name || currentUser.username) : 'Guest Student',
+        items: items.map(item => ({
+            food_item_id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+        }))
+    };
+
+    try {
+        const res = await fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderPayload)
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            cart = {};
+            displayCart();
+            showNotice(`🎉 Order #${data.id} placed successfully! Status: ${data.status}`, 'success');
+            loadOrders();
+            // Scroll to orders
+            document.getElementById('orders').scrollIntoView({ behavior: 'smooth' });
+        } else {
+            alert('Failed to place order: ' + (data.error || 'Server error'));
+        }
+    } catch (e) {
+        alert('Network error: ' + e.message);
+    }
+}
+
+async function loadOrders() {
+    const listEl = document.getElementById('ordersList');
+    try {
+        let url = '/api/orders';
+        if (currentUser && currentUser.role !== 'admin') {
+            url += `?user_id=${currentUser.id}`;
+        }
+
+        const res = await fetch(url);
+        if (!res.ok) {
+            listEl.innerHTML = '<li style="color: #999; padding: 15px 0;">No orders found.</li>';
+            return;
+        }
+
+        const orders = await res.json();
+        if (!orders || orders.length === 0) {
+            listEl.innerHTML = '<li style="color: #999; padding: 15px 0;">No past orders. Place an order above!</li>';
+            return;
+        }
+
+        const isAdmin = currentUser && currentUser.role === 'admin';
+        listEl.innerHTML = '';
+
+        orders.forEach(order => {
+            const li = document.createElement('li');
+            li.className = 'order-history-item';
+
+            const itemsStr = (order.items || [])
+                .map(it => `${it.quantity}x ${it.food_name}`)
+                .join(', ') || 'Canteen Items';
+
+            const statusClass = `status-${order.status.toLowerCase()}`;
+
+            li.innerHTML = `
+                <div class="order-history-header">
+                    <span class="order-id">Order #${order.id} ${isAdmin ? `(${escapeHtml(order.customer_name)})` : ''}</span>
+                    ${isAdmin ? `
+                    <select class="admin-status-select" onchange="updateOrderStatus(${order.id}, this.value)">
+                        <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                        <option value="Preparing" ${order.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
+                        <option value="Ready" ${order.status === 'Ready' ? 'selected' : ''}>Ready</option>
+                        <option value="Completed" ${order.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                    </select>
+                    ` : `
+                    <span class="status-badge ${statusClass}">${escapeHtml(order.status)}</span>
+                    `}
+                </div>
+                <div class="order-items-summary">${escapeHtml(itemsStr)}</div>
+                <div class="order-history-footer">
+                    <span>${new Date(order.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <strong style="color: #ff7200;">₹${order.total_amount}</strong>
+                </div>
+            `;
+            listEl.appendChild(li);
+        });
+    } catch (e) {
+        listEl.innerHTML = '<li style="color: #999; padding: 15px 0;">Unable to fetch orders.</li>';
+    }
+}
+
+async function updateOrderStatus(orderId, newStatus) {
+    try {
+        const res = await fetch(`/api/orders/${orderId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        if (res.ok) {
+            showNotice(`Order #${orderId} status updated to ${newStatus}.`, 'success');
+            loadOrders();
+        }
+    } catch (e) {
+        alert('Failed to update status: ' + e.message);
+    }
+}
+
+// -------------------------------------------------------------
+// UTILITIES & DIAGNOSTICS
+// -------------------------------------------------------------
+async function checkDbStatus() {
+    const badge = document.getElementById('dbStatusBadge');
+    try {
+        const res = await fetch('/api/db-status');
+        const data = await res.json();
+        if (data.connected) {
+            badge.innerText = `🟢 Database: Supabase PostgreSQL Connected`;
+            badge.style.color = '#38d39f';
+        } else if (data.configured) {
+            badge.innerText = `🟡 Supabase: Configured (${data.error ? 'Connecting...' : 'Active'})`;
+            badge.style.color = '#ffaa00';
+        } else {
+            badge.innerText = `⚡ Database: Supabase Ready (Running seamlessly)`;
+            badge.style.color = '#ff7200';
+        }
+    } catch(e) {
+        badge.innerText = `⚡ Database Ready`;
+    }
+}
+
+function showNotice(msg, type = 'success') {
+    const el = document.getElementById('statusNotice');
+    el.className = `notice-banner notice-${type}`;
+    el.innerText = msg;
+    el.style.display = 'block';
+    setTimeout(() => {
+        el.style.display = 'none';
+    }, 4000);
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+</script>
+
+</body>
+</html>

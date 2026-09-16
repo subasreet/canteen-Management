@@ -1,0 +1,8 @@
+{
+  "name": "College Canteen Management",
+  "description": "A college canteen management system to browse food items, filter by category, search the menu, and place orders with Supabase PostgreSQL database integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
