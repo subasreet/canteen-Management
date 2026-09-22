@@ -513,6 +513,194 @@ nav a:hover {
     background: white;
 }
 
+/* AI MANAGEMENT ASSISTANT */
+.ai-analytics-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-top: 50px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border-top: 4px solid #ff7200;
+}
+
+.ai-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.ai-title-group h2 {
+    font-size: 24px;
+    color: #222;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ai-title-group p {
+    color: #666;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.ai-badge {
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    border: 1px solid #c7d2fe;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ai-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.ai-kpi-card {
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-kpi-card span.label {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #777;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.ai-kpi-card span.value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #222;
+    margin-top: 4px;
+}
+
+.ai-prompt-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.ai-chip {
+    background: #fff8f0;
+    color: #ff7200;
+    border: 1px solid #ffd8b2;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ai-chip:hover {
+    background: #ff7200;
+    color: white;
+}
+
+.ai-search-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.ai-search-row input {
+    flex: 1;
+    min-width: 250px;
+    padding: 12px 18px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.ai-search-row input:focus {
+    border-color: #ff7200;
+}
+
+.btn-ai-submit {
+    background: #ff7200;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-ai-submit:hover {
+    background: #e65f00;
+}
+
+.ai-result-panel {
+    background: #fafbfc;
+    border: 1px solid #e1e4e8;
+    border-radius: 10px;
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+.ai-result-panel h2, .ai-result-panel h3, .ai-result-panel h4 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    color: #111;
+}
+
+.ai-result-panel ul {
+    margin-left: 20px;
+    margin-bottom: 12px;
+}
+
+.ai-result-panel li {
+    margin-bottom: 6px;
+}
+
+.ai-loading-box {
+    display: none;
+    text-align: center;
+    padding: 35px 20px;
+    color: #666;
+}
+
+.ai-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #ff7200;
+    border-radius: 50%;
+    animation: ai-spin 1s linear infinite;
+    margin: 0 auto 15px auto;
+}
+
+@keyframes ai-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* MODAL */
 
 .modal-backdrop {
@@ -703,6 +891,7 @@ footer a {
             <a href="#menu">Menu</a>
             <a href="#cart">Cart</a>
             <a href="#orders">Orders</a>
+            <a href="#ai-analytics" style="color: #ffaa00; font-weight: bold;">🤖 AI Analytics</a>
         </nav>
 
         <div id="authContainer">
@@ -882,6 +1071,92 @@ footer a {
 
     </div>
 
+    <!-- AI ASSISTANT FOR ANALYZING MANAGEMENT DATA -->
+    <div class="ai-analytics-card" id="ai-analytics">
+
+        <div class="ai-header">
+            <div class="ai-title-group">
+                <h2>🤖 AI Management Assistant & Data Analytics</h2>
+                <p>Live operational and financial intelligence for canteen administrators and staff</p>
+            </div>
+            <div class="ai-badge" id="aiSourceBadge">
+                ✨ Gemini 3.8 Flash • AI Assistant
+            </div>
+        </div>
+
+        <!-- Quick Metrics Overview -->
+        <div class="ai-kpi-grid">
+            <div class="ai-kpi-card">
+                <span class="label">Gross Sales</span>
+                <span class="value" id="kpiRevenue">₹0</span>
+            </div>
+            <div class="ai-kpi-card">
+                <span class="label">Total Orders</span>
+                <span class="value" id="kpiOrders">0</span>
+            </div>
+            <div class="ai-kpi-card">
+                <span class="label">Average Ticket</span>
+                <span class="value" id="kpiAvgTicket">₹0</span>
+            </div>
+            <div class="ai-kpi-card">
+                <span class="label">Top Selling Item</span>
+                <span class="value" id="kpiTopItem" style="font-size: 18px; line-height: 1.3;">-</span>
+            </div>
+        </div>
+
+        <!-- Preset One-Click Inquiries -->
+        <p style="font-size: 13px; font-weight: bold; color: #555; margin-bottom: 8px;">
+            Quick Analytical Inquiries:
+        </p>
+        <div class="ai-prompt-chips">
+            <button type="button" class="ai-chip" onclick="triggerAiPreset('Provide an executive summary of total revenue, orders count, and key financial takeaways.')">
+                📈 Revenue & Performance Summary
+            </button>
+            <button type="button" class="ai-chip" onclick="triggerAiPreset('Which food items and categories have highest student demand, and which are underperforming?')">
+                🏆 Best Selling Items & Categories
+            </button>
+            <button type="button" class="ai-chip" onclick="triggerAiPreset('Analyze order statuses, kitchen queues, and potential fulfillment bottlenecks.')">
+                ⚡ Kitchen Workflow & Bottlenecks
+            </button>
+            <button type="button" class="ai-chip" onclick="triggerAiPreset('Suggest 3 practical strategies to reduce waste, optimize pricing, and increase canteen revenue.')">
+                💡 Management Optimization Advice
+            </button>
+        </div>
+
+        <!-- Custom Question Input -->
+        <div class="ai-search-row">
+            <input 
+                type="text" 
+                id="aiQueryInput" 
+                placeholder="Ask the AI assistant anything about sales, food items, or operations..." 
+                onkeydown="if(event.key==='Enter') runAiAnalytics()"
+            />
+            <button type="button" class="btn-ai-submit" id="btnAiAnalyze" onclick="runAiAnalytics()">
+                ✨ Analyze Data
+            </button>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="aiLoading" class="ai-loading-box">
+            <div class="ai-spinner"></div>
+            <p><strong>Analyzing live management records with AI...</strong></p>
+            <p style="font-size: 13px; margin-top: 4px; color: #888;">Aggregating order logs, item quantities, and revenue breakdowns...</p>
+        </div>
+
+        <!-- Error Banner -->
+        <div id="aiError" class="notice-banner notice-error" style="display: none; margin-bottom: 15px;"></div>
+
+        <!-- Result Box -->
+        <div id="aiResult" class="ai-result-panel">
+            <div style="text-align: center; color: #777; padding: 25px 0;" id="aiEmptyPlaceholder">
+                <p style="font-size: 16px; margin-bottom: 6px;">📊 <strong>Ready to analyze canteen management data</strong></p>
+                <p style="font-size: 13px;">Select any of the quick inquiries above or type a custom question to generate real-time AI insights.</p>
+            </div>
+            <div id="aiResultContent" style="display: none;"></div>
+        </div>
+
+    </div>
+
 </div>
 
 
@@ -1049,6 +1324,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFoodItems();
     loadOrders();
     checkDbStatus();
+    loadAiAnalyticsKPIs();
 });
 
 // -------------------------------------------------------------
@@ -1552,6 +1828,117 @@ function escapeHtml(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+// -------------------------------------------------------------
+// AI ASSISTANT FOR ANALYZING MANAGEMENT DATA
+// -------------------------------------------------------------
+function triggerAiPreset(queryText) {
+    document.getElementById('aiQueryInput').value = queryText;
+    runAiAnalytics(queryText);
+}
+
+async function loadAiAnalyticsKPIs() {
+    try {
+        const res = await fetch('/api/ai/analytics', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: 'Brief KPI metrics check' })
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.metrics) {
+                document.getElementById('kpiRevenue').innerText = '₹' + data.metrics.totalRevenue;
+                document.getElementById('kpiOrders').innerText = data.metrics.totalOrders;
+                document.getElementById('kpiAvgTicket').innerText = '₹' + data.metrics.averageOrderValue;
+                document.getElementById('kpiTopItem').innerText = data.metrics.topItem || '-';
+            }
+        }
+    } catch(e) {
+        console.warn('Initial AI KPIs load skipped:', e.message);
+    }
+}
+
+async function runAiAnalytics(customQuery = null) {
+    const inputEl = document.getElementById('aiQueryInput');
+    const query = customQuery !== null ? customQuery : (inputEl.value.trim() || 'Provide an executive summary of total revenue, orders count, and key financial takeaways.');
+
+    const loadingEl = document.getElementById('aiLoading');
+    const resultContent = document.getElementById('aiResultContent');
+    const placeholder = document.getElementById('aiEmptyPlaceholder');
+    const errorEl = document.getElementById('aiError');
+    const btn = document.getElementById('btnAiAnalyze');
+    const badge = document.getElementById('aiSourceBadge');
+
+    errorEl.style.display = 'none';
+    placeholder.style.display = 'none';
+    resultContent.style.display = 'none';
+    loadingEl.style.display = 'block';
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/api/ai/analytics', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.error || 'Server error generating analysis');
+        }
+
+        // Update KPIs
+        if (data.metrics) {
+            document.getElementById('kpiRevenue').innerText = '₹' + data.metrics.totalRevenue;
+            document.getElementById('kpiOrders').innerText = data.metrics.totalOrders;
+            document.getElementById('kpiAvgTicket').innerText = '₹' + data.metrics.averageOrderValue;
+            document.getElementById('kpiTopItem').innerText = data.metrics.topItem || '-';
+        }
+
+        if (data.source && data.source.includes('gemini')) {
+            badge.innerText = '✨ Gemini 3.8 Flash • AI Analysis';
+            badge.style.background = '#eef2ff';
+            badge.style.color = '#4338ca';
+        } else {
+            badge.innerText = '⚡ Canteen Analytics Engine';
+            badge.style.background = '#fef3c7';
+            badge.style.color = '#92400e';
+        }
+
+        // Render Markdown to clean HTML
+        resultContent.innerHTML = formatMarkdown(data.analysis);
+        resultContent.style.display = 'block';
+
+    } catch (err) {
+        errorEl.innerText = 'Unable to generate analysis: ' + err.message;
+        errorEl.style.display = 'block';
+        placeholder.style.display = 'block';
+    } finally {
+        loadingEl.style.display = 'none';
+        btn.disabled = false;
+    }
+}
+
+function formatMarkdown(text) {
+    if (!text) return '<p>No analysis generated.</p>';
+    let html = escapeHtml(text);
+    
+    // Headers
+    html = html.replace(/^### (.*$)/gim, '<h4 style="font-size: 16px; margin: 18px 0 8px; color: #ff7200;">$1</h4>');
+    html = html.replace(/^## (.*$)/gim, '<h3 style="font-size: 18px; margin: 20px 0 10px; color: #222;">$1</h3>');
+    html = html.replace(/^# (.*$)/gim, '<h2 style="font-size: 20px; margin: 22px 0 12px; color: #222;">$1</h2>');
+    
+    // Bold
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // List items
+    html = html.replace(/^\s*-\s+(.*$)/gim, '<li style="margin-bottom: 6px;">$1</li>');
+    html = html.replace(/(<li.*<\/li>)/gms, '<ul style="margin: 8px 0 12px 20px;">$1</ul>');
+    
+    // Paragraphs
+    html = html.replace(/\n\n/g, '<p style="margin-bottom: 10px;"></p>');
+    return html;
 }
 
 </script>

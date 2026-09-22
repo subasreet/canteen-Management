@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 
 // 12 Initial Food Items from existing canteen system
@@ -11,7 +12,7 @@ const SEED_FOOD_ITEMS = [
   { id: 7, name: 'Samosa', category: 'snacks', price: 20, description: 'Crispy samosa filled with spicy potato.', image_url: 'https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7', is_available: true },
   { id: 8, name: 'Medu Vada', category: 'snacks', price: 15, description: 'Crispy South Indian vada served with chutney.', image_url: 'https://images.unsplash.com/photo-1601050690597-df0568f70950', is_available: true },
   { id: 9, name: 'Vegetable Sandwich', category: 'snacks', price: 40, description: 'Fresh vegetable sandwich with tasty filling.', image_url: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af', is_available: true },
-  { id: 10, name: 'Tea', category: 'drinks', price: 15, description: 'Hot and refreshing tea.', image_url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574', image_url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574', is_available: true },
+  { id: 10, name: 'Tea', category: 'drinks', price: 15, description: 'Hot and refreshing tea.', image_url: 'https://images.unsplash.com/photo-1544787219-7f47ccb76574', is_available: true },
   { id: 11, name: 'Coffee', category: 'drinks', price: 20, description: 'Hot and fresh filter coffee.', image_url: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93', is_available: true },
   { id: 12, name: 'Lemon Juice', category: 'drinks', price: 25, description: 'Fresh and refreshing lemon juice.', image_url: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859', is_available: true }
 ];

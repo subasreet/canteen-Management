@@ -133,6 +133,40 @@ async function runTests() {
     const updateStatusRes = await request('PUT', `/api/orders/${orderId}/status`, { status: 'Preparing' });
     assert(updateStatusRes.status === 200 && updateStatusRes.body.status === 'Preparing', 'Can update order status to "Preparing"');
 
+    // Test 7: Supabase Schema and Migration Integrity
+    console.log('\n[Test 7] Supabase Schema & Migration File Verification:');
+    const fs = require('fs');
+    const path = require('path');
+    const schemaSql = fs.readFileSync(path.join(__dirname, 'supabase', 'schema.sql'), 'utf-8');
+    assert(schemaSql.includes('CREATE TABLE IF NOT EXISTS users'), 'Schema defines users table');
+    assert(schemaSql.includes('CREATE TABLE IF NOT EXISTS food_items'), 'Schema defines food_items table');
+    assert(schemaSql.includes('CREATE TABLE IF NOT EXISTS orders'), 'Schema defines orders table');
+    assert(schemaSql.includes('CREATE TABLE IF NOT EXISTS order_items'), 'Schema defines order_items table');
+    assert(schemaSql.includes('REFERENCES users(id)'), 'Foreign key orders -> users established');
+    assert(schemaSql.includes('REFERENCES orders(id)'), 'Foreign key order_items -> orders established');
+    assert(schemaSql.includes('REFERENCES food_items(id)'), 'Foreign key order_items -> food_items established');
+    assert(schemaSql.includes("'Chicken Biryani'") && schemaSql.includes("'Lemon Juice'"), 'All original 12 food items preserved in seed');
+    assert(fs.existsSync(path.join(__dirname, 'scripts', 'migrate.js')), 'Dedicated scripts/migrate.js exists');
+
+    // Test 8: AI Assistant for Analyzing Management Data
+    console.log('\n[Test 8] AI Assistant for Analyzing Management Data:');
+    const aiDefaultRes = await request('POST', '/api/ai/analytics', {});
+    assert(aiDefaultRes.status === 200, 'AI analytics endpoint returns 200 OK');
+    assert(aiDefaultRes.body && aiDefaultRes.body.success === true, 'AI analytics response indicates success');
+    assert(typeof aiDefaultRes.body?.analysis === 'string' && aiDefaultRes.body.analysis.length > 50, 'AI analysis contains formatted management insights');
+    assert(aiDefaultRes.body?.metrics?.totalRevenue !== undefined, 'AI analytics computes total revenue');
+    assert(aiDefaultRes.body?.metrics?.totalOrders !== undefined, 'AI analytics computes total orders');
+    assert(aiDefaultRes.body?.metrics?.statusBreakdown !== undefined, 'AI analytics breaks down order statuses');
+
+    // Test with realistic custom prompt
+    const aiCustomRes = await request('POST', '/api/ai/analytics', {
+      query: 'Which food items and meal categories produce the highest revenue for the canteen?'
+    });
+    assert(aiCustomRes.status === 200, 'Custom inquiry to AI assistant returns 200 OK');
+    assert(aiCustomRes.body?.success === true, 'Custom query returns successful response');
+    assert(aiCustomRes.body?.analysis?.length > 50, 'Custom query generates detailed analysis report');
+    assert(['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'analytics-engine'].includes(aiCustomRes.body?.source), `Valid AI source provider: ${aiCustomRes.body?.source}`);
+
     console.log(`\n--- Test Summary: ${passed} passed, ${failed} failed ---`);
     if (failed > 0) {
       process.exit(1);
