@@ -7,70 +7,134 @@
 
 <title>College Canteen Management</title>
 <meta property="og:title" content="College Canteen Management">
-<meta name="description" content="A college canteen management system to browse food items, filter by category, search the menu, and place orders with Supabase PostgreSQL database integration.">
-<meta property="og:description" content="A college canteen management system to browse food items, filter by category, search the menu, and place orders with Supabase PostgreSQL database integration.">
+<meta name="description" content="A progressive web app (PWA) college canteen management system with offline caching, mobile home screen installation, menu browsing, order placement, and Supabase integration.">
+<meta property="og:description" content="A progressive web app (PWA) college canteen management system with offline caching, mobile home screen installation, menu browsing, order placement, and Supabase integration.">
+
+<!-- PWA Manifest & App Configuration -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ff7200">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Canteen">
+
+<!-- App Icons for Desktop, Android, and iOS Safari -->
+<link rel="icon" type="image/svg+xml" href="/icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/pwa-512x512.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 <style>
 
+/* BASE & RESET */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
     background: #f5f6f8;
     color: #222;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* HEADER */
+button {
+    touch-action: manipulation;
+    font-family: inherit;
+}
 
+button:active {
+    transform: scale(0.97);
+}
+
+/* HEADER & NAVIGATION */
 header {
     background: #20242b;
     color: white;
-    padding: 18px 6%;
+    padding: 14px 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.18);
 }
 
 .logo {
-    font-size: 25px;
+    font-size: 24px;
     font-weight: bold;
     cursor: pointer;
     text-decoration: none;
     color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.2s;
+}
+
+.logo:hover {
+    opacity: 0.9;
 }
 
 .nav-container {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     flex-wrap: wrap;
 }
 
-nav a {
-    color: white;
-    text-decoration: none;
-    font-size: 15px;
-    transition: color 0.2s;
+nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-nav a:hover {
+nav a {
+    color: #eee;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 40px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s;
+    touch-action: manipulation;
+    white-space: nowrap;
+}
+
+nav a:hover,
+nav a:focus {
     color: #ff7200;
+    background: rgba(255, 114, 0, 0.12);
 }
 
 .user-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: #2c323c;
     padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 14px;
+    border-radius: 25px;
+    font-size: 13px;
+    max-width: 100%;
+    flex-wrap: wrap;
 }
 
 .role-pill {
@@ -81,6 +145,7 @@ nav a:hover {
     border-radius: 10px;
     font-weight: bold;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .role-pill.admin {
@@ -91,12 +156,18 @@ nav a:hover {
     background: #ff7200;
     color: white;
     border: none;
-    padding: 7px 16px;
+    min-height: 40px;
+    padding: 8px 18px;
     border-radius: 20px;
     font-size: 13px;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
 }
 
 .btn-header:hover {
@@ -105,48 +176,107 @@ nav a:hover {
 
 .btn-logout {
     background: #444;
+    padding: 5px 12px;
+    min-height: 32px;
+    font-size: 12px;
 }
 
 .btn-logout:hover {
     background: #555;
 }
 
-/* HERO */
+/* PWA INSTALL & OFFLINE STYLES */
+.btn-install {
+    background: #10b981;
+    color: white;
+    border: none;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    animation: installPulse 3s infinite ease-in-out;
+}
 
+.btn-install:hover {
+    background: #059669;
+}
+
+@keyframes installPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+.offline-pill {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #20242b;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 9999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    border: 1px solid #ff7200;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    animation: slideUpFade 0.3s ease;
+}
+
+.offline-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #ffaa00;
+    box-shadow: 0 0 8px #ffaa00;
+}
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translate(-50%, 15px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* HERO SECTION */
 .hero {
-    height: 280px;
+    min-height: 220px;
+    height: 30vh;
+    max-height: 280px;
     background:
     linear-gradient(
-        rgba(0,0,0,0.6),
-        rgba(0,0,0,0.6)
+        rgba(0,0,0,0.65),
+        rgba(0,0,0,0.65)
     ),
     url("https://images.unsplash.com/photo-1515003197210-e0cd71810b5f")
-    center/cover;
-
+    center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     color: white;
-    padding: 20px;
+    padding: 24px 16px;
 }
 
 .hero h1 {
-    font-size: 40px;
-    margin-bottom: 12px;
+    font-size: clamp(26px, 5vw, 42px);
+    margin-bottom: 8px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
 }
 
 .hero p {
-    font-size: 18px;
+    font-size: clamp(14px, 3.5vw, 18px);
     opacity: 0.95;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-/* MAIN */
-
+/* MAIN CONTAINER */
 .container {
-    width: 90%;
+    width: 92%;
     max-width: 1200px;
-    margin: 40px auto;
+    margin: 35px auto 50px;
+    flex-grow: 1;
 }
 
 .heading {
@@ -155,66 +285,87 @@ nav a:hover {
 }
 
 .heading h2 {
-    font-size: 30px;
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: 800;
+    color: #1a1a1a;
 }
 
 .heading p {
-    color: #777;
-    margin-top: 8px;
+    color: #666;
+    margin-top: 6px;
+    font-size: 15px;
 }
 
-/* SEARCH & CONTROLS */
-
+/* SEARCH & ADMIN CONTROLS */
 .search-bar-row {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px;
+    gap: 14px;
     margin-bottom: 25px;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .search-box {
     text-align: center;
+    max-width: 440px;
+    width: 100%;
 }
 
 .search-box input {
-    width: 320px;
-    max-width: 100%;
-    padding: 12px 18px;
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 20px;
     border: 1px solid #ccc;
     border-radius: 25px;
     outline: none;
-    font-size: 15px;
+    font-size: 16px; /* 16px prevents iOS Safari auto-zoom */
+    background: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-box input:focus {
+    border-color: #ff7200;
+    box-shadow: 0 0 0 3px rgba(255, 114, 0, 0.15);
 }
 
 .btn-admin-add {
     background: #28a745;
     color: white;
     border: none;
-    padding: 12px 20px;
+    min-height: 46px;
+    padding: 12px 22px;
     border-radius: 25px;
     font-weight: bold;
+    font-size: 14px;
     cursor: pointer;
     display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    white-space: nowrap;
 }
 
 .btn-admin-add:hover {
     background: #218838;
 }
 
-/* CATEGORY */
-
+/* CATEGORIES */
 .categories {
     display: flex;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 35px;
+    margin-bottom: 30px;
 }
 
 .category-btn {
-    padding: 10px 22px;
+    min-height: 44px;
+    padding: 10px 20px;
     border: 1px solid #ff7200;
     background: white;
     color: #ff7200;
@@ -223,35 +374,41 @@ nav a:hover {
     font-weight: bold;
     font-size: 14px;
     transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    touch-action: manipulation;
 }
 
 .category-btn:hover,
 .category-btn.active {
     background: #ff7200;
     color: white;
+    box-shadow: 0 4px 10px rgba(255, 114, 0, 0.25);
 }
 
-/* FOOD GRID */
-
+/* FOOD GRID & CARDS */
 .food-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
 }
 
 .food-card {
     background: white;
-    border-radius: 12px;
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    transition: transform 0.25s, box-shadow 0.25s;
     display: flex;
     flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.04);
 }
 
 .food-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
 .food-card img {
@@ -260,10 +417,11 @@ nav a:hover {
     object-fit: cover;
     display: block;
     background: #eee;
+    aspect-ratio: 16/10;
 }
 
 .food-info {
-    padding: 18px;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -278,9 +436,10 @@ nav a:hover {
 }
 
 .food-info h3 {
-    margin: 8px 0;
-    font-size: 20px;
+    margin: 8px 0 6px;
+    font-size: 19px;
     color: #222;
+    word-break: break-word;
 }
 
 .food-info p {
@@ -289,6 +448,7 @@ nav a:hover {
     line-height: 1.5;
     margin-bottom: 15px;
     flex-grow: 1;
+    word-break: break-word;
 }
 
 .food-bottom {
@@ -296,6 +456,7 @@ nav a:hover {
     justify-content: space-between;
     align-items: center;
     margin-top: auto;
+    padding-top: 8px;
 }
 
 .price {
@@ -308,12 +469,18 @@ nav a:hover {
     background: #ff7200;
     color: white;
     border: none;
-    padding: 9px 18px;
-    border-radius: 6px;
+    min-height: 44px;
+    min-width: 76px;
+    padding: 10px 18px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 14px;
-    transition: background 0.2s;
+    font-size: 15px;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
 }
 
 .add-btn:hover {
@@ -333,56 +500,58 @@ nav a:hover {
     background: #007bff;
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
 }
 
 .btn-card-delete {
     background: #dc3545;
     color: white;
     border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 12px;
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
 }
 
-/* CART & ORDERS SPLIT OR ROW */
-
+/* CART & ORDERS SECTIONS */
 .grid-sections {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-top: 50px;
-}
-
-@media(max-width: 900px) {
-    .grid-sections {
-        grid-template-columns: 1fr;
-    }
+    gap: 28px;
+    margin-top: 45px;
 }
 
 .cart, .orders-card {
     background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 24px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.04);
 }
 
 .cart h2, .orders-card h2 {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 22px;
+    font-size: 21px;
+    color: #222;
 }
 
 #cartItems {
     list-style: none;
-    max-height: 320px;
+    max-height: 340px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .cart-item {
@@ -390,27 +559,44 @@ nav a:hover {
     justify-content: space-between;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #f0f0f0;
+    gap: 12px;
+}
+
+.quantity {
+    display: inline-flex;
+    align-items: center;
 }
 
 .quantity button {
-    width: 28px;
-    height: 28px;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
     border: none;
-    background: #eee;
-    border-radius: 5px;
+    background: #f0f1f3;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+    transition: background 0.15s;
 }
 
 .quantity button:hover {
-    background: #ddd;
+    background: #e2e4e8;
 }
 
 .quantity span {
     margin: 0 10px;
     font-weight: bold;
+    font-size: 15px;
+    min-width: 22px;
+    text-align: center;
+    display: inline-block;
 }
 
 .total {
@@ -419,20 +605,27 @@ nav a:hover {
     margin-top: 20px;
     font-size: 20px;
     font-weight: bold;
+    padding-top: 12px;
+    border-top: 2px solid #f5f5f5;
 }
 
 .order-btn {
     width: 100%;
+    min-height: 48px;
     padding: 14px;
     margin-top: 20px;
     background: #28a745;
     color: white;
     border: none;
-    border-radius: 7px;
+    border-radius: 8px;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     transition: background 0.2s;
+    touch-action: manipulation;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .order-btn:hover {
@@ -440,16 +633,16 @@ nav a:hover {
 }
 
 /* ORDER HISTORY */
-
 .orders-list {
     list-style: none;
     max-height: 380px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .order-history-item {
     padding: 14px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .order-history-header {
@@ -457,17 +650,20 @@ nav a:hover {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .order-id {
     font-weight: bold;
     color: #333;
+    font-size: 14px;
 }
 
 .status-badge {
     font-size: 12px;
     font-weight: bold;
-    padding: 3px 10px;
+    padding: 4px 10px;
     border-radius: 12px;
     text-transform: capitalize;
 }
@@ -496,31 +692,38 @@ nav a:hover {
     font-size: 13px;
     color: #666;
     margin-bottom: 6px;
+    line-height: 1.4;
+    word-break: break-word;
 }
 
 .order-history-footer {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 13px;
     color: #888;
 }
 
 .admin-status-select {
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 4px;
+    font-size: 13px;
+    min-height: 36px;
+    padding: 4px 10px;
+    border-radius: 6px;
     border: 1px solid #ccc;
     background: white;
 }
 
-/* AI MANAGEMENT ASSISTANT */
+/* AI MANAGEMENT ASSISTANT & ANALYTICS */
 .ai-analytics-card {
     background: white;
-    border-radius: 12px;
-    padding: 30px;
-    margin-top: 50px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border-radius: 14px;
+    padding: 28px;
+    margin-top: 45px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
     border-top: 4px solid #ff7200;
+    border-left: 1px solid rgba(0,0,0,0.04);
+    border-right: 1px solid rgba(0,0,0,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.04);
 }
 
 .ai-header {
@@ -528,16 +731,17 @@ nav a:hover {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 25px;
+    gap: 14px;
+    margin-bottom: 22px;
 }
 
 .ai-title-group h2 {
-    font-size: 24px;
+    font-size: clamp(20px, 3.5vw, 24px);
     color: #222;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .ai-title-group p {
@@ -549,7 +753,7 @@ nav a:hover {
 .ai-badge {
     background: #eef2ff;
     color: #4338ca;
-    padding: 5px 14px;
+    padding: 6px 14px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: bold;
@@ -557,26 +761,27 @@ nav a:hover {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
 }
 
 .ai-kpi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-bottom: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
 }
 
 .ai-kpi-card {
-    background: #fdfdfd;
-    border: 1px solid #eee;
+    background: #fbfbfc;
+    border: 1px solid #eaedf1;
     border-radius: 10px;
-    padding: 16px 20px;
+    padding: 14px 16px;
     display: flex;
     flex-direction: column;
 }
 
 .ai-kpi-card span.label {
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
     color: #777;
     font-weight: bold;
@@ -584,7 +789,7 @@ nav a:hover {
 }
 
 .ai-kpi-card span.value {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bold;
     color: #222;
     margin-top: 4px;
@@ -593,7 +798,7 @@ nav a:hover {
 .ai-prompt-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 18px;
 }
 
@@ -601,12 +806,17 @@ nav a:hover {
     background: #fff8f0;
     color: #ff7200;
     border: 1px solid #ffd8b2;
-    padding: 8px 16px;
+    min-height: 40px;
+    padding: 8px 14px;
     border-radius: 20px;
     font-size: 13px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s;
+    touch-action: manipulation;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1.3;
 }
 
 .ai-chip:hover {
@@ -617,51 +827,66 @@ nav a:hover {
 .ai-search-row {
     display: flex;
     gap: 12px;
-    margin-bottom: 25px;
+    margin-bottom: 22px;
     flex-wrap: wrap;
 }
 
 .ai-search-row input {
     flex: 1;
-    min-width: 250px;
+    min-width: 240px;
+    min-height: 46px;
     padding: 12px 18px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 16px; /* 16px prevents iOS Safari auto-zoom */
     outline: none;
+    background: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .ai-search-row input:focus {
     border-color: #ff7200;
+    box-shadow: 0 0 0 3px rgba(255, 114, 0, 0.15);
 }
 
 .btn-ai-submit {
     background: #ff7200;
     color: white;
     border: none;
-    padding: 12px 24px;
+    min-height: 46px;
+    padding: 12px 22px;
     border-radius: 8px;
     font-weight: bold;
     font-size: 14px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     transition: background 0.2s;
+    touch-action: manipulation;
+    white-space: nowrap;
 }
 
 .btn-ai-submit:hover {
     background: #e65f00;
 }
 
+.btn-ai-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
 .ai-result-panel {
     background: #fafbfc;
     border: 1px solid #e1e4e8;
     border-radius: 10px;
-    padding: 24px;
+    padding: 20px;
     font-size: 14px;
     line-height: 1.6;
     color: #333;
+    overflow-x: auto;
+    word-break: break-word;
 }
 
 .ai-result-panel h2, .ai-result-panel h3, .ai-result-panel h4 {
@@ -682,18 +907,18 @@ nav a:hover {
 .ai-loading-box {
     display: none;
     text-align: center;
-    padding: 35px 20px;
+    padding: 30px 16px;
     color: #666;
 }
 
 .ai-spinner {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border: 3px solid #f3f3f3;
     border-top: 3px solid #ff7200;
     border-radius: 50%;
     animation: ai-spin 1s linear infinite;
-    margin: 0 auto 15px auto;
+    margin: 0 auto 14px auto;
 }
 
 @keyframes ai-spin {
@@ -701,8 +926,7 @@ nav a:hover {
     100% { transform: rotate(360deg); }
 }
 
-/* MODAL */
-
+/* MODALS */
 .modal-backdrop {
     display: none;
     position: fixed;
@@ -710,37 +934,58 @@ nav a:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.55);
     z-index: 1000;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 16px;
+    backdrop-filter: blur(3px);
 }
 
 .modal-content {
     background: white;
     width: 100%;
     max-width: 440px;
-    border-radius: 12px;
-    padding: 28px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-close {
     position: absolute;
-    top: 15px;
-    right: 18px;
-    font-size: 22px;
-    color: #999;
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 26px;
+    color: #888;
     cursor: pointer;
     border: none;
     background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    touch-action: manipulation;
+    transition: background 0.15s, color 0.15s;
+}
+
+.modal-close:hover {
+    color: #222;
+    background: #f0f0f0;
 }
 
 .modal-title {
-    font-size: 22px;
-    margin-bottom: 16px;
+    font-size: 21px;
+    margin-bottom: 14px;
+    color: #222;
+    padding-right: 32px;
 }
 
 .form-group {
@@ -755,26 +1000,45 @@ nav a:hover {
     color: #444;
 }
 
-.form-group input, .form-group select, .form-group textarea {
+.form-group input, 
+.form-group select, 
+.form-group textarea {
     width: 100%;
+    min-height: 44px;
     padding: 10px 14px;
     border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-size: 16px; /* Prevents auto-zoom on mobile */
     outline: none;
+    background: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group textarea {
+    min-height: 70px;
+}
+
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus {
+    border-color: #ff7200;
+    box-shadow: 0 0 0 3px rgba(255, 114, 0, 0.15);
 }
 
 .modal-btn-submit {
     width: 100%;
+    min-height: 48px;
     padding: 12px;
     background: #ff7200;
     color: white;
     border: none;
-    border-radius: 6px;
-    font-size: 15px;
+    border-radius: 8px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     margin-top: 8px;
+    touch-action: manipulation;
+    transition: background 0.2s;
 }
 
 .modal-btn-submit:hover {
@@ -789,13 +1053,19 @@ nav a:hover {
 
 .demo-pill {
     flex: 1;
-    padding: 8px;
+    min-height: 44px;
+    padding: 8px 10px;
     border: 1px solid #ddd;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 12px;
     text-align: center;
     cursor: pointer;
     background: #fafafa;
+    touch-action: manipulation;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
 }
 
 .demo-pill:hover {
@@ -804,13 +1074,13 @@ nav a:hover {
 }
 
 /* NOTICE BANNER */
-
 .notice-banner {
     padding: 12px 18px;
     border-radius: 8px;
     margin-bottom: 20px;
     display: none;
     font-size: 14px;
+    word-break: break-word;
 }
 
 .notice-success {
@@ -826,13 +1096,12 @@ nav a:hover {
 }
 
 /* FOOTER */
-
 footer {
     background: #20242b;
     color: #aaa;
     text-align: center;
-    padding: 24px;
-    margin-top: 60px;
+    padding: 24px 16px;
+    margin-top: auto;
     font-size: 14px;
 }
 
@@ -846,28 +1115,246 @@ footer a {
     background: #2d333b;
     color: #38d39f;
     font-size: 12px;
-    padding: 4px 12px;
-    border-radius: 12px;
+    padding: 5px 14px;
+    border-radius: 14px;
     margin-top: 10px;
     border: 1px solid #414b57;
+    word-break: break-word;
 }
 
-/* MOBILE RESPONSIVE */
+/* ======================================================= */
+/* RESPONSIVE DESIGN & SCREEN SIZE OPTIMIZATIONS           */
+/* ======================================================= */
 
-@media(max-width: 650px) {
+/* 1. TABLET & MEDIUM SCREENS (<= 900px) */
+@media (max-width: 900px) {
+    .grid-sections {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        margin-top: 36px;
+    }
+}
+
+/* 2. TABLET PORTRAIT & MOBILE (<= 768px) */
+@media (max-width: 768px) {
     header {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-areas: 
+            "logo auth"
+            "nav nav";
+        padding: 12px 4%;
+        gap: 10px 8px;
+    }
+
+    .logo {
+        grid-area: logo;
+        font-size: 21px;
+        align-self: center;
+    }
+
+    .nav-container {
+        display: contents; /* Allows children to participate directly in header grid */
+    }
+
+    .header-actions, #authContainer {
+        grid-area: auth;
+        align-self: center;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    nav {
+        grid-area: nav;
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 6px;
+        padding-top: 4px;
+        padding-bottom: 2px;
+    }
+
+    nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    nav a {
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 6px 12px;
+        font-size: 13px;
+        min-height: 38px;
+    }
+
+    .categories {
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 4px 4px 12px 4px;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .categories::-webkit-scrollbar {
+        display: none;
+    }
+
+    .category-btn {
+        flex-shrink: 0;
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .hero {
+        min-height: 190px;
+        height: auto;
+        padding: 30px 16px;
+    }
+
+    .ai-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+}
+
+/* 3. STANDARD MOBILE SCREENS (<= 600px) */
+@media (max-width: 600px) {
+    .container {
+        width: 94%;
+        margin: 20px auto 35px;
+    }
+
+    .search-bar-row {
+        flex-direction: column;
+        align-items: stretch;
+        max-width: 100%;
+        gap: 10px;
+    }
+
+    .search-box {
+        max-width: 100%;
+    }
+
+    .search-box input {
+        border-radius: 12px;
+        font-size: 16px;
+    }
+
+    .btn-admin-add {
+        width: 100%;
+        border-radius: 12px;
+    }
+
+    .food-grid {
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 16px;
+    }
+
+    .food-card img {
+        height: 160px;
+    }
+
+    .food-info {
+        padding: 14px;
+    }
+
+    .food-info h3 {
+        font-size: 18px;
+    }
+
+    .cart, .orders-card {
+        padding: 18px 14px;
+        border-radius: 12px;
+    }
+
+    .cart h2, .orders-card h2 {
+        font-size: 19px;
+    }
+
+    .ai-analytics-card {
+        padding: 18px 14px;
+        margin-top: 30px;
+        border-radius: 12px;
+    }
+
+    .ai-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 10px;
     }
-    .nav-container {
+
+    .ai-search-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ai-search-row input {
         width: 100%;
-        justify-content: space-between;
+        font-size: 16px;
     }
-    .hero h1 {
-        font-size: 30px;
-    }
-    .search-box input {
+
+    .btn-ai-submit {
         width: 100%;
+        min-height: 46px;
+        font-size: 15px;
+    }
+
+    .ai-chip {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .modal-content {
+        padding: 20px 16px;
+    }
+}
+
+/* 4. COMPACT MOBILE SCREENS (<= 400px) */
+@media (max-width: 400px) {
+    .container {
+        width: 96%;
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+
+    .btn-header {
+        padding: 6px 12px;
+        font-size: 12px;
+        min-height: 36px;
+    }
+
+    .user-badge {
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+
+    .food-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ai-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .order-history-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .admin-status-select {
+        width: 100%;
+    }
+
+    .demo-account-pills {
+        flex-direction: column;
     }
 }
 
@@ -894,10 +1381,15 @@ footer a {
             <a href="#ai-analytics" style="color: #ffaa00; font-weight: bold;">🤖 AI Analytics</a>
         </nav>
 
-        <div id="authContainer">
-            <button id="btnLoginOpen" class="btn-header" onclick="openLoginModal()">
-                🔑 Login
+        <div class="header-actions" style="display: flex; align-items: center; gap: 8px;">
+            <button id="btnPwaInstall" class="btn-header btn-install" onclick="triggerPwaInstall()" style="display: none;" title="Install application on your device">
+                📲 Install App
             </button>
+            <div id="authContainer">
+                <button id="btnLoginOpen" class="btn-header" onclick="openLoginModal()">
+                    🔑 Login
+                </button>
+            </div>
         </div>
 
     </div>
@@ -1280,6 +1772,38 @@ footer a {
 </div>
 
 
+<!-- ======================================================= -->
+<!-- PWA iOS INSTALLATION GUIDE MODAL -->
+<!-- ======================================================= -->
+
+<div id="iosInstallModal" class="modal-backdrop">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <button class="modal-close" onclick="closeIosInstallModal()">×</button>
+        <div style="font-size: 38px; margin-bottom: 8px;">📲</div>
+        <h3 class="modal-title" style="padding-right: 0; margin-bottom: 8px; font-size: 20px;">Install on iPhone / iPad</h3>
+        <p style="color: #666; font-size: 14px; margin-bottom: 18px; line-height: 1.5;">
+            Add College Canteen to your home screen for quick, fullscreen native access:
+        </p>
+        <div style="background: #f8f9fa; border-radius: 12px; padding: 14px 16px; text-align: left; font-size: 13.5px; line-height: 1.7; margin-bottom: 18px; border: 1px solid #e9ecef; color: #333;">
+            <p style="margin-bottom: 6px;"><strong>1.</strong> Tap the <strong>Share</strong> button <span style="font-size: 15px;">⎋</span> at the bottom of Safari.</p>
+            <p style="margin-bottom: 6px;"><strong>2.</strong> Scroll down and select <strong>"Add to Home Screen"</strong> <span style="font-size: 15px;">⊞</span>.</p>
+            <p><strong>3.</strong> Tap <strong>"Add"</strong> in the top-right corner.</p>
+        </div>
+        <button class="modal-btn-submit" onclick="closeIosInstallModal()" style="margin-top: 0;">Got it!</button>
+    </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- OFFLINE CONNECTIVITY INDICATOR PILL -->
+<!-- ======================================================= -->
+
+<div id="offlineIndicator" class="offline-pill" role="status" aria-live="polite">
+    <span class="offline-dot"></span>
+    <span>Offline Mode — Showing cached menu. Reconnecting...</span>
+</div>
+
+
 <script>
 
 // Global State
@@ -1466,7 +1990,7 @@ function renderFoodGrid() {
         const imgUrl = item.image_url || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c';
 
         card.innerHTML = `
-            <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.name)}" referrerpolicy="no-referrer">
+            <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(item.name)}" referrerpolicy="no-referrer" loading="lazy">
             <div class="food-info">
                 <span class="category-name">${escapeHtml(item.category)}</span>
                 <h3>${escapeHtml(item.name)}</h3>
@@ -1940,6 +2464,118 @@ function formatMarkdown(text) {
     html = html.replace(/\n\n/g, '<p style="margin-bottom: 10px;"></p>');
     return html;
 }
+
+// ===================================================================
+// PROGRESSIVE WEB APP (PWA) INITIALIZATION & LOGIC
+// ===================================================================
+
+let deferredInstallPrompt = null;
+
+// 1. Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then((registration) => {
+                console.log('PWA Service Worker registered with scope:', registration.scope);
+            })
+            .catch((err) => {
+                console.warn('PWA Service Worker registration notice:', err);
+            });
+    });
+}
+
+// 2. Standalone Mode & Platform Detection
+const isRunningStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                           window.navigator.standalone === true ||
+                           document.referrer.includes('android-app://');
+
+const isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) && !window.MSStream;
+
+// 3. In-App Install Prompt Handling
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent default mini-infobar on mobile
+    e.preventDefault();
+    deferredInstallPrompt = e;
+
+    // Show custom in-app install button if not already in standalone mode
+    if (!isRunningStandalone) {
+        const installBtn = document.getElementById('btnPwaInstall');
+        if (installBtn) {
+            installBtn.style.display = 'inline-flex';
+        }
+    }
+});
+
+// For iOS Safari (which doesn't fire beforeinstallprompt)
+if (isIOS && !isRunningStandalone) {
+    window.addEventListener('DOMContentLoaded', () => {
+        const installBtn = document.getElementById('btnPwaInstall');
+        if (installBtn) {
+            installBtn.style.display = 'inline-flex';
+        }
+    });
+}
+
+// In-app Install Trigger (Android, Desktop, iOS)
+async function triggerPwaInstall() {
+    if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const choiceResult = await deferredInstallPrompt.userChoice;
+        if (choiceResult && choiceResult.outcome === 'accepted') {
+            const installBtn = document.getElementById('btnPwaInstall');
+            if (installBtn) installBtn.style.display = 'none';
+            deferredInstallPrompt = null;
+        }
+    } else if (isIOS) {
+        openIosInstallModal();
+    } else {
+        // Fallback for browsers with address bar install icon
+        showNotice('To install: click the install icon in your browser address bar or menu.', 'success');
+    }
+}
+
+// App installed event listener
+window.addEventListener('appinstalled', () => {
+    const installBtn = document.getElementById('btnPwaInstall');
+    if (installBtn) installBtn.style.display = 'none';
+    deferredInstallPrompt = null;
+    showNotice('🎉 College Canteen installed successfully on your device!', 'success');
+});
+
+// iOS Guide Modal Controls
+function openIosInstallModal() {
+    const modal = document.getElementById('iosInstallModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeIosInstallModal() {
+    const modal = document.getElementById('iosInstallModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// 4. Offline/Online Connectivity Status Monitoring
+function updateNetworkStatus() {
+    const offlineIndicator = document.getElementById('offlineIndicator');
+    if (!offlineIndicator) return;
+
+    if (!navigator.onLine) {
+        offlineIndicator.style.display = 'flex';
+    } else {
+        if (offlineIndicator.style.display === 'flex') {
+            offlineIndicator.innerHTML = '<span class="offline-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981;"></span><span>Online — Reconnected to server</span>';
+            setTimeout(() => {
+                offlineIndicator.style.display = 'none';
+                offlineIndicator.innerHTML = '<span class="offline-dot"></span><span>Offline Mode — Showing cached menu. Reconnecting...</span>';
+            }, 2500);
+        } else {
+            offlineIndicator.style.display = 'none';
+        }
+    }
+}
+
+window.addEventListener('online', updateNetworkStatus);
+window.addEventListener('offline', updateNetworkStatus);
+window.addEventListener('DOMContentLoaded', updateNetworkStatus);
 
 </script>
 

@@ -167,6 +167,48 @@ async function runTests() {
     assert(aiCustomRes.body?.analysis?.length > 50, 'Custom query generates detailed analysis report');
     assert(['gemini-3.1-flash-lite', 'gemini-3.8-flash', 'analytics-engine'].includes(aiCustomRes.body?.source), `Valid AI source provider: ${aiCustomRes.body?.source}`);
 
+    // Test 9: Progressive Web App (PWA) Verification
+    console.log('\n[Test 9] Progressive Web App (PWA) Verification:');
+    const manifestRes = await request('GET', '/manifest.json');
+    assert(manifestRes.status === 200, 'Manifest returns 200 OK');
+    assert(manifestRes.body?.name === 'College Canteen Management', 'Manifest defines full application name');
+    assert(manifestRes.body?.short_name && manifestRes.body.short_name.length <= 12, 'Manifest short_name is <= 12 characters');
+    assert(manifestRes.body?.start_url === '/', 'Manifest start_url is /');
+    assert(manifestRes.body?.display === 'standalone', 'Manifest display mode is standalone');
+    assert(manifestRes.body?.theme_color === '#ff7200', 'Manifest specifies brand theme_color');
+    assert(Array.isArray(manifestRes.body?.icons) && manifestRes.body.icons.length >= 3, 'Manifest defines required icon set');
+    
+    const icon192 = manifestRes.body.icons.find(i => i.sizes === '192x192' && i.purpose === 'any');
+    const icon512 = manifestRes.body.icons.find(i => i.sizes === '512x512' && i.purpose === 'any');
+    const iconMaskable = manifestRes.body.icons.find(i => i.purpose === 'maskable');
+    assert(icon192 !== undefined, '192x192 any icon is configured');
+    assert(icon512 !== undefined, '512x512 any icon is configured');
+    assert(iconMaskable !== undefined, 'Maskable icon is configured with separate purpose');
+
+    const swRes = await request('GET', '/sw.js');
+    assert(swRes.status === 200, 'Service worker sw.js returns 200 OK');
+    assert(swRes.headers['service-worker-allowed'] === '/' || typeof swRes.body === 'string', 'Service worker is accessible');
+
+    const svgIconRes = await request('GET', '/icon.svg');
+    assert(svgIconRes.status === 200, 'icon.svg returns 200 OK');
+
+    const png192Res = await request('GET', '/pwa-192x192.png');
+    assert(png192Res.status === 200, 'pwa-192x192.png returns 200 OK');
+
+    const png512Res = await request('GET', '/pwa-512x512.png');
+    assert(png512Res.status === 200, 'pwa-512x512.png returns 200 OK');
+
+    const appleIconRes = await request('GET', '/apple-touch-icon.png');
+    assert(appleIconRes.status === 200, 'apple-touch-icon.png returns 200 OK');
+
+    const indexHtmlRes = await request('GET', '/');
+    assert(indexHtmlRes.status === 200, 'App shell returns 200 OK');
+    assert(indexHtmlRes.body.includes('rel="manifest"'), 'App shell links to manifest.json');
+    assert(indexHtmlRes.body.includes('apple-touch-icon'), 'App shell includes apple-touch-icon');
+    assert(indexHtmlRes.body.includes('btnPwaInstall'), 'App shell includes in-app install button');
+    assert(indexHtmlRes.body.includes('iosInstallModal'), 'App shell includes iOS install guide modal');
+    assert(indexHtmlRes.body.includes('offlineIndicator'), 'App shell includes offline connectivity indicator');
+
     console.log(`\n--- Test Summary: ${passed} passed, ${failed} failed ---`);
     if (failed > 0) {
       process.exit(1);

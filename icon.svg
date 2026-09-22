@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff8c2b" />
+      <stop offset="100%" stop-color="#ff7200" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGrad)" />
+
+  <!-- Outer Plate Rim -->
+  <circle cx="256" cy="256" r="180" fill="#20242b" filter="url(#shadow)" />
+  <circle cx="256" cy="256" r="160" fill="#ffffff" />
+  <circle cx="256" cy="256" r="130" fill="#20242b" />
+
+  <!-- Fork (Left) -->
+  <g fill="#ffaa00">
+    <!-- Fork handle -->
+    <rect x="180" y="240" width="16" height="110" rx="8" />
+    <!-- Fork base -->
+    <path d="M165 240 Q188 255 211 240 L211 210 Q211 180 188 180 Q165 180 165 210 Z" />
+    <!-- Fork tines cutout -->
+    <rect x="175" y="170" width="4" height="40" fill="#20242b" rx="2" />
+    <rect x="197" y="170" width="4" height="40" fill="#20242b" rx="2" />
+  </g>
+
+  <!-- Knife (Right) -->
+  <g fill="#ffaa00">
+    <!-- Knife handle -->
+    <rect x="316" y="240" width="16" height="110" rx="8" />
+    <!-- Knife blade -->
+    <path d="M316 160 Q336 170 336 240 L316 240 Z" />
+  </g>
+
+  <!-- Sparkle Star (Center) -->
+  <path d="M256 220 L262 245 L287 251 L262 257 L256 282 L250 257 L225 251 L250 245 Z" fill="#ffffff" />
+</svg>

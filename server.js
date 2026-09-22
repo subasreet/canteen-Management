@@ -9,8 +9,18 @@ const PORT = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from root directory
-app.use(express.static(path.join(__dirname, '.')));
+// Serve static files from root directory with PWA headers
+app.use(express.static(path.join(__dirname, '.'), {
+  setHeaders: (res, filePath) => {
+    const filename = path.basename(filePath);
+    if (filename === 'sw.js') {
+      res.setHeader('Service-Worker-Allowed', '/');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    } else if (filename === 'manifest.json') {
+      res.setHeader('Content-Type', 'application/manifest+json; charset=UTF-8');
+    }
+  }
+}));
 
 // -------------------------------------------------------------------
 // Database Status & Diagnostics API

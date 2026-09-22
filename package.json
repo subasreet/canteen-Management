@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "node server.js",
-    "build": "echo 'Build complete'",
+    "build": "node scripts/generate-icons.js && echo 'Build complete'",
     "lint": "echo 'No lint errors'",
     "test": "node test.js",
     "migrate": "node scripts/migrate.js",
